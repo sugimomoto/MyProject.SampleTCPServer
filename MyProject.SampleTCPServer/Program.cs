@@ -55,7 +55,10 @@ namespace MyProject.SampleTCPServer
 
             if (!disconnected)
             {
-                var sendMsg = resMsg.Length.ToString();
+                var sendMsg = @"HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+
+<!DOCTYPE html><html><head>    <title></title></head><body>    <p>Hello World</p></body></html>";
 
                 var sendBytes = enc.GetBytes(sendMsg);
 
