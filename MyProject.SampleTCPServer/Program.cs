@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MyProject.SampleTCPServer
@@ -37,7 +38,7 @@ namespace MyProject.SampleTCPServer
             do
             {
                 resSize = ns.Read(resBytes, 0, resBytes.Length);
-                if(resSize == 0)
+                if (resSize == 0)
                 {
                     disconnected = true;
                     Console.WriteLine("クライアントが切断しました");
@@ -45,8 +46,31 @@ namespace MyProject.SampleTCPServer
                 }
 
                 ms.Write(resBytes, 0, resSize);
+            } while (ns.DataAvailable || resBytes[resSize - 1] != '\n');
 
+            var resMsg = enc.GetString(ms.GetBuffer(), 0, (int)ms.Length);
+            ms.Close();
+
+            Console.WriteLine(resMsg);
+
+            if (!disconnected)
+            {
+                var sendMsg = resMsg.Length.ToString();
+
+                var sendBytes = enc.GetBytes(sendMsg);
+
+                ns.Write(sendBytes, 0, sendBytes.Length);
+                Console.WriteLine(sendMsg);
             }
+
+            ns.Close();
+            client.Close();
+
+            Console.WriteLine("クライアントとの接続を閉じました");
+
+            listner.Stop();
+            Console.WriteLine("Listnerを閉じました");
+
 
 
 
